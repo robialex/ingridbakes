@@ -7,7 +7,7 @@ const ReviewsPage = () => {
       },
       {
         name: "Andreas P.",
-        review: "Cozy atmosphere and the best coffee I've had in a long time. The pistachio cake was divine.",
+        review: "Cozy atmosphere and the best coffee I&apos;ve had in a long time. The pistachio cake was divine.",
         rating: 5,
       },
       {
@@ -24,11 +24,11 @@ const ReviewsPage = () => {
           {reviews.map((review) => (
             <div key={review.name} className="border rounded-lg p-6 text-center">
               <div className="flex justify-center">
-                {Array(review.rating).fill(
-                  <span className="text-yellow-500">&#9733;</span>
-                )}
+                {Array.from({ length: review.rating }).map((_, idx) => (
+                  <span key={idx} className="text-yellow-500">&#9733;</span>
+                ))}
               </div>
-              <p className="mt-4 italic">"{review.review}"</p>
+              <p className="mt-4 italic">&quot;{review.review}&quot;</p>
               <p className="mt-4 font-bold">- {review.name}</p>
             </div>
           ))}
@@ -38,4 +38,3 @@ const ReviewsPage = () => {
   };
   
   export default ReviewsPage;
-  
