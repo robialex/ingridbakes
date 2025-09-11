@@ -10,7 +10,7 @@ function useFadeInOnScroll(delay = 0, direction: 'left' | 'right' | 'up' = 'up')
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    let translateClass =
+    const translateClass =
       direction === 'left'
         ? 'translate-x-12'
         : direction === 'right'
@@ -130,7 +130,7 @@ function Hero() {
             Ingrid Bakes
           </h1>
           <p className="text-lg md:text-2xl text-[#1B3A57]/90 max-w-2xl mx-auto mb-8 drop-shadow font-sans">
-            Luxurious cakes & pastries, crafted with Mediterranean soul. Cozy interiors, golden moments.
+            Luxurious cakes &amp; pastries, crafted with Mediterranean soul. Cozy interiors, golden moments.
           </p>
           <div className="flex gap-4 flex-wrap justify-center">
             <PrimaryButton href="/menu">Explore Menu</PrimaryButton>
@@ -187,13 +187,35 @@ function QuickIntro() {
       </div>
       <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1B3A57] mb-4 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
-          Authentic & Artisanal
+          Authentic &amp; Artisanal
         </h2>
         <p className="text-lg md:text-xl text-[#5A6B7C] leading-relaxed mb-2 font-sans drop-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
           At Ingrid Bakes, every dessert is a celebration of Mediterranean tradition and luxury. We use only the finest ingredients—no artificial colors, ever—for a cozy, unforgettable café experience.
         </p>
       </div>
     </section>
+  );
+}
+
+// ====== Gallery Image Card (Refactored for hook) ======
+function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string; direction: 'left' | 'right'; rotate: string; delay: number; alt: string }) {
+  const ref = useFadeInOnScroll(delay, direction);
+  return (
+    <div
+      ref={ref}
+      className={`relative w-full h-64 rounded-2xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 group ${rotate}`}
+      style={{
+        background: "linear-gradient(135deg,#fff8e1 0%, #f7f5f2 100%)",
+      }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+      />
+      <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-2xl" />
+    </div>
   );
 }
 
@@ -220,28 +242,76 @@ function GallerySection() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {galleryImages.map((src, i) => {
-            const direction = i % 2 === 0 ? 'left' : 'right';
-            const ref = useFadeInOnScroll(i * 120, direction as 'left' | 'right');
+            const direction: 'left' | 'right' = i % 2 === 0 ? 'left' : 'right';
             const rotate = i % 2 === 0 ? "-rotate-2" : "rotate-2";
             return (
-              <div
+              <GalleryImageCard
                 key={src}
-                ref={ref}
-                className={`relative w-full h-64 rounded-2xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 group ${rotate}`}
-                style={{
-                  background: "linear-gradient(135deg,#fff8e1 0%, #f7f5f2 100%)",
-                }}
-              >
-                <Image
-                  src={src}
-                  alt={`Bakery gallery image ${i + 1}`}
-                  fill
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-2xl" />
-              </div>
+                src={src}
+                direction={direction}
+                rotate={rotate}
+                delay={i * 120}
+                alt={`Bakery gallery image ${i + 1}`}
+              />
             );
           })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ====== Dessert Card (Refactored for hook) ======
+function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; delay: number }) {
+  const ref = useFadeInOnScroll(delay, 'up');
+  return (
+    <div
+      ref={ref}
+      className="group relative rounded-2xl p-5 bg-white/80 border border-[#D4AF37]/30 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 hover:scale-[1.04] flex flex-col items-center opacity-0 translate-y-8"
+      style={{
+        background: "linear-gradient(135deg, #fff8e1 0%, #f7f5f2 100%)",
+      }}
+    >
+      <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden mb-4">
+        <Image
+          src={dessert.image}
+          alt={dessert.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, 25vw"
+        />
+        <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-xl" />
+      </div>
+      <h3 className="font-serif text-lg md:text-xl text-[#1B3A57] font-semibold mb-1 text-center drop-shadow-sm animate-fade-in">
+        {dessert.name}
+      </h3>
+      <p className="text-sm text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>{dessert.desc}</p>
+      <div className="mt-auto flex justify-center">
+        <PrimaryButton href="/menu">View details</PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+// ====== Featured Desserts Section ======
+function FeaturedDesserts() {
+  return (
+    <section className="py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative">
+      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
+      {/* Abstract Mediterranean lines/shapes */}
+      <div className="absolute left-0 top-0 w-full h-full pointer-events-none z-0">
+        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-24 md:h-32">
+          <path fill="#D4AF37" fillOpacity="0.07" d="M0,288L80,272C160,256,320,224,480,218.7C640,213,800,235,960,229.3C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        </svg>
+      </div>
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <h2 className="text-center font-serif text-3xl md:text-4xl font-bold mb-12 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
+          Our Featured Desserts
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {featuredDesserts.map((dessert, idx) => (
+            <DessertCard key={dessert.name} dessert={dessert} delay={idx * 150} />
+          ))}
         </div>
       </div>
     </section>
@@ -286,62 +356,6 @@ function MapSection() {
   );
 }
 
-// ====== Featured Desserts Section ======
-function FeaturedDesserts() {
-  return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative">
-      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
-      {/* Abstract Mediterranean lines/shapes */}
-      <div className="absolute left-0 top-0 w-full h-full pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-24 md:h-32">
-          <path fill="#D4AF37" fillOpacity="0.07" d="M0,288L80,272C160,256,320,224,480,218.7C640,213,800,235,960,229.3C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
-        </svg>
-      </div>
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
-        <h2 className="text-center font-serif text-3xl md:text-4xl font-bold mb-12 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
-          Our Featured Desserts
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {featuredDesserts.map((dessert, idx) => (
-            <DessertCard key={dessert.name} dessert={dessert} delay={idx * 150} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; delay: number }) {
-  const ref = useFadeInOnScroll(delay, 'up');
-  return (
-    <div
-      ref={ref}
-      className="group relative rounded-2xl p-5 bg-white/80 border border-[#D4AF37]/30 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 hover:scale-[1.04] flex flex-col items-center opacity-0 translate-y-8"
-      style={{
-        background: "linear-gradient(135deg, #fff8e1 0%, #f7f5f2 100%)",
-      }}
-    >
-      <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden mb-4">
-        <Image
-          src={dessert.image}
-          alt={dessert.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 25vw"
-        />
-        <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-xl" />
-      </div>
-      <h3 className="font-serif text-lg md:text-xl text-[#1B3A57] font-semibold mb-1 text-center drop-shadow-sm animate-fade-in">
-        {dessert.name}
-      </h3>
-      <p className="text-sm text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>{dessert.desc}</p>
-      <div className="mt-auto flex justify-center">
-        <PrimaryButton href="/menu">View details</PrimaryButton>
-      </div>
-    </div>
-  );
-}
-
 // ====== CTA Section ======
 function CTASection() {
   const ref = useFadeInOnScroll(600);
@@ -377,7 +391,7 @@ function Footer() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
         <div className="flex flex-col items-center md:items-start">
           <span className="font-serif text-xl font-bold text-[#D4AF37] mb-2">Ingrid Bakes</span>
-          <span className="text-sm font-sans">Mediterranean Café & Bakery</span>
+          <span className="text-sm font-sans">Mediterranean Café &amp; Bakery</span>
           <span className="text-sm font-sans mt-2">Limassol, Cyprus</span>
           <span className="text-sm font-sans mt-1">357 99127455</span>
           <span className="text-sm font-sans mt-1">info@ingridbakes.com</span>
@@ -389,7 +403,7 @@ function Footer() {
           <Link href="/contact" className="text-white/80 hover:text-[#D4AF37] transition-colors hover:underline underline-offset-4">Contact</Link>
           <PrimaryButton href="https://wa.me/35799127455" external>
             <span className="text-sm font-semibold">WhatsApp Order</span>
-            <span aria-hidden>💬</span>
+            <span aria-hidden>&#128172;</span>
           </PrimaryButton>
         </div>
       </div>
