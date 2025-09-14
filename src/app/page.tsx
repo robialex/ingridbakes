@@ -2,7 +2,64 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Head from "next/head";
+
+// ====== GALLERY & DESSERT ARRAYS ======
+const galleryImages: string[] = [
+  "/imgs/gallery1.jpg",
+  "/imgs/gallery2.jpg",
+  "/imgs/gallery3.jpg",
+  "/imgs/gallery4.jpg",
+  "/imgs/gallery5.jpg",
+  "/imgs/gallery6.jpg",
+  "/imgs/gallery7.jpg",
+  "/imgs/gallery8.jpg",
+  "/imgs/gallery9.jpg",
+];
+
+const featuredDesserts: { name: string; desc: string; image: string }[] = [
+  {
+    name: "Mediterranean Pistachio Cake",
+    desc: "Layers of pistachio sponge, honey cream, and rosewater syrup.",
+    image: "/imgs/dessert1.jpg",
+  },
+  {
+    name: "Lemon Olive Oil Loaf",
+    desc: "Moist, fragrant loaf with Sicilian lemons and extra virgin olive oil.",
+    image: "/imgs/dessert2.jpg",
+  },
+  {
+    name: "Chocolate Hazelnut Torte",
+    desc: "Rich chocolate cake with roasted hazelnuts and silky ganache.",
+    image: "/imgs/dessert3.jpg",
+  },
+  {
+    name: "Orange Blossom Cheesecake",
+    desc: "Creamy cheesecake infused with orange blossom and almond crust.",
+    image: "/imgs/dessert4.jpg",
+  },
+  {
+    name: "Baklava Millefeuille",
+    desc: "Crispy layers, pistachio cream, and honeyed syrup.",
+    image: "/imgs/dessert5.jpg",
+  },
+  {
+    name: "Rosewater Éclair",
+    desc: "Choux pastry filled with rosewater custard and gold leaf.",
+    image: "/imgs/dessert6.jpg",
+  },
+  {
+    name: "Almond Citrus Tart",
+    desc: "Fragrant almond cream, candied orange, and buttery crust.",
+    image: "/imgs/dessert7.jpg",
+  },
+  {
+    name: "Fig & Walnut Cake",
+    desc: "Spiced cake with figs, walnuts, and honey glaze.",
+    image: "/imgs/dessert8.jpg",
+  },
+];
 
 // ====== Animation Hook ======
 function useFadeInOnScroll(delay = 0, direction: 'left' | 'right' | 'up' = 'up') {
@@ -32,63 +89,166 @@ function useFadeInOnScroll(delay = 0, direction: 'left' | 'right' | 'up' = 'up')
   return ref;
 }
 
-// ====== Featured Desserts Data ======
-const featuredDesserts = [
-  {
-    name: "Basque Cheesecake",
-    image: "/imgs/basque-cheesecake.jpg",
-    desc: "Caramelized, creamy, unforgettable.",
-  },
-  {
-    name: "Pistachio Cake",
-    image: "/imgs/pistachio-cake.jpg",
-    desc: "Nutty, rich, Mediterranean classic.",
-  },
-  {
-    name: "Raspberry-Pistachio Cake",
-    image: "/imgs/raspberry-pistachio.jpg",
-    desc: "Tangy, vibrant, seasonal favorite.",
-  },
-  {
-    name: "Lemon-Mint Honey Cake",
-    image: "/imgs/lemon-mint-honey.jpg",
-    desc: "Bright, floral, honey-sweetened.",
-  },
-];
+// ====== Luxury Bakery Button (Unified) ======
+function LuxuryBakeryButton({
+  href,
+  children,
+  external = false,
+  className = "",
+}: {
+  href: string;
+  children: React.ReactNode;
+  external?: boolean;
+  className?: string;
+}) {
+  const base =
+    "luxury-btn relative rounded-full px-7 py-3 font-bold text-[#2d210a] text-lg shadow-[0_2px_12px_rgba(212,175,55,0.10)] " +
+    "bg-gradient-to-br from-[#f7e7b2] via-[#e6c76e] to-[#bfa14b] border-2 border-[#e6c76e] " +
+    "hover:scale-105 hover:shadow-[0_4px_24px_rgba(212,175,55,0.18)] transition-all duration-200 " +
+    "focus:outline-none focus:ring-2 focus:ring-[#D4AF37] overflow-hidden group " +
+    "tracking-wider w-full sm:w-auto min-h-[44px] " +
+    className;
 
-// ====== Gallery Images ======
-const galleryImages = [
-  "/imgs/gallery-1.jpg",
-  "/imgs/gallery-2.jpg",
-  "/imgs/gallery-3.jpg",
-  "/imgs/gallery-4.jpg",
-  "/imgs/gallery-5.jpg",
-  "/imgs/gallery-6.jpg",
-];
+  // Use Playfair Display for luxury serif font
+  const textClass = "relative z-10 font-bold tracking-wider font-[Playfair_Display,serif]";
 
-// ====== Navigation Bar ======
+  const ButtonContent = (
+    <>
+      <span className={textClass}>{children}</span>
+      {/* Gold texture overlay */}
+      <span className="absolute inset-0 pointer-events-none rounded-full"
+        style={{
+          background: "repeating-linear-gradient(135deg,rgba(255,255,220,0.10) 0px,rgba(212,175,55,0.12) 8px,rgba(255,255,220,0.10) 16px)",
+          mixBlendMode: "soft-light",
+        }}
+      />
+      {/* Shimmer effect */}
+      <span className="absolute left-0 top-0 w-full h-full pointer-events-none overflow-hidden">
+        <span className="block absolute left-[-60%] top-0 w-[220%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-80 animate-shimmer rounded-full" />
+      </span>
+      <style jsx>{`
+        .animate-shimmer {
+          animation: shimmerLuxuryBtn 1.2s linear forwards;
+        }
+        @keyframes shimmerLuxuryBtn {
+          0% { transform: translateX(-60%); opacity: 0.4; }
+          40% { opacity: 0.8; }
+          100% { transform: translateX(60%); opacity: 0; }
+        }
+      `}</style>
+    </>
+  );
+
+  return (
+    <>
+      {/* Google Fonts Head injection */}
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap"
+          rel="stylesheet"
+        />
+        <style>{`
+          .font-[Playfair_Display,serif] {
+            font-family: 'Playfair Display', serif !important;
+          }
+        `}</style>
+      </Head>
+      {external ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className={base}
+          aria-label={typeof children === "string" ? children : undefined}
+        >
+          {ButtonContent}
+        </a>
+      ) : (
+        <Link href={href} className={base}>
+          {ButtonContent}
+        </Link>
+      )}
+    </>
+  );
+}
+
+// ====== Responsive Navbar ======
 function Navbar() {
+  const [open, setOpen] = useState(false);
+  const navLinks = [
+    { name: "Menu", href: "/menu" },
+    { name: "Gallery", href: "/gallery" },
+    { name: "Reviews", href: "/reviews" },
+    { name: "Contact", href: "/contact" },
+  ];
+
   return (
     <nav
       style={{ height: 'var(--nav-h)' }}
       className="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-br from-[#102233] via-[#153445] to-[#0f2433] border-b border-white/5 bg-opacity-95 shadow-lg"
     >
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="font-serif text-2xl font-bold text-[#D4AF37] tracking-wide">Ingrid Bakes</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+        <Link href="/" className="flex-1 flex items-center justify-center sm:justify-start gap-2">
+          <span className="font-serif text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] tracking-wide">
+            Ingrid Bakes
+          </span>
         </Link>
+        {/* Desktop Links */}
         <div className="hidden md:flex gap-6 items-center">
-          {["Menu", "Gallery", "Reviews", "Contact"].map((item) => (
+          {navLinks.map((item) => (
             <Link
-              key={item}
-              href={`/${item.toLowerCase()}`}
-              className="text-white font-medium transition-all duration-200 hover:text-[#D4AF37] hover:scale-105 hover:underline underline-offset-4"
+              key={item.name}
+              href={item.href}
+              className="luxury-nav-link text-[#f7f5f2] font-medium transition-all duration-200 px-2 py-1 rounded hover:text-[#D4AF37] hover:bg-[#fff8e1]/10 hover:underline underline-offset-6"
             >
-              {item}
+              {item.name}
+            </Link>
+          ))}
+        </div>
+        {/* Hamburger for mobile */}
+        <button
+          className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          aria-label="Open menu"
+          onClick={() => setOpen((o) => !o)}
+        >
+          <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+            <rect y="7" width="32" height="3" rx="1.5" fill="#D4AF37" />
+            <rect y="14" width="32" height="3" rx="1.5" fill="#D4AF37" />
+            <rect y="21" width="32" height="3" rx="1.5" fill="#D4AF37" />
+          </svg>
+        </button>
+      </div>
+      {/* Mobile Dropdown */}
+      <div
+        className={`md:hidden absolute left-0 top-full w-full transition-all duration-300 overflow-hidden ${
+          open ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+        style={{ boxShadow: open ? "0 8px 32px rgba(212,175,55,0.10)" : undefined }}
+      >
+        <div className="bg-[#fff8e1] rounded-b-2xl py-2 px-4 flex flex-col gap-1 border-t border-[#e6c76e]">
+          {navLinks.map((item, idx) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="w-full py-3 px-2 text-center font-serif font-bold text-lg text-[#1B3A57] hover:text-[#D4AF37] transition-colors"
+              style={{
+                borderBottom:
+                  idx < navLinks.length - 1
+                    ? "1px solid #e6c76e"
+                    : "none",
+              }}
+              onClick={() => setOpen(false)}
+            >
+              {item.name}
             </Link>
           ))}
         </div>
       </div>
+      {/* Decorative gold sparkles */}
+      <svg className="absolute right-8 top-2 w-12 h-12 opacity-10 pointer-events-none" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#D4AF37" strokeWidth="2" strokeDasharray="4 6" />
+        <circle cx="24" cy="24" r="6" fill="#D4AF37" fillOpacity="0.12" />
+      </svg>
     </nav>
   );
 }
@@ -107,34 +267,41 @@ function Hero() {
           fill
           priority
           className="object-cover object-center"
+          sizes="100vw"
+          style={{ objectPosition: "center top" }}
         />
         {/* Decorative gold pattern overlay */}
         <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
       </div>
       {/* Gradient overlay for readability */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
+      {/* Decorative gold swirl */}
+      <svg className="absolute right-8 bottom-8 w-32 h-32 opacity-10 pointer-events-none" viewBox="0 0 100 100" fill="none">
+        <path d="M20 80 Q50 20 80 80" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <circle cx="50" cy="50" r="8" fill="#D4AF37" fillOpacity="0.08" />
+      </svg>
       {/* Content */}
       <div
         ref={ref}
-        className="relative z-20 px-6 text-center max-w-3xl flex flex-col items-center"
+        className="relative z-20 px-4 sm:px-6 text-center max-w-3xl flex flex-col items-center"
       >
         {/* Creamy rectangle with gold border */}
-        <div className="bg-[#fff8e1]/80 rounded-xl px-8 py-10 shadow-2xl border-2 border-[#D4AF37] relative backdrop-blur-0"
+        <div className="bg-[#fff8e1]/80 rounded-xl px-4 sm:px-8 py-8 sm:py-10 shadow-2xl border-2 border-[#D4AF37] relative backdrop-blur-0"
           style={{
             boxShadow: "0 8px 32px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.10)",
           }}
         >
           {/* Decorative gold shine top left */}
           <span className="absolute top-0 left-0 w-12 h-2 bg-gradient-to-r from-[#D4AF37]/60 to-transparent rounded-t-xl" />
-          <h1 className="font-serif text-5xl md:text-7xl font-bold text-[#1B3A57] drop-shadow-[0_10px_25px_rgba(212,175,55,0.25)] mb-4">
+          <h1 className="font-serif text-3xl sm:text-5xl md:text-7xl font-bold text-[#1B3A57] drop-shadow-[0_10px_25px_rgba(212,175,55,0.25)] mb-4">
             Ingrid Bakes
           </h1>
-          <p className="text-lg md:text-2xl text-[#1B3A57]/90 max-w-2xl mx-auto mb-8 drop-shadow font-sans">
+          <p className="text-base sm:text-lg md:text-2xl text-[#1B3A57]/90 max-w-2xl mx-auto mb-6 sm:mb-8 drop-shadow font-sans">
             Luxurious cakes &amp; pastries, crafted with Mediterranean soul. Cozy interiors, golden moments.
           </p>
-          <div className="flex gap-4 flex-wrap justify-center">
-            <PrimaryButton href="/menu">Explore Menu</PrimaryButton>
-            <PrimaryButton href="https://wa.me/35799127455" external>Order Now</PrimaryButton>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full">
+            <LuxuryBakeryButton href="/menu" className="sm:w-auto w-full">Explore Menu</LuxuryBakeryButton>
+            <LuxuryBakeryButton href="https://wa.me/35799127455" external className="sm:w-auto w-full">Order Now</LuxuryBakeryButton>
           </div>
         </div>
       </div>
@@ -142,54 +309,27 @@ function Hero() {
   );
 }
 
-// ====== Primary Button Component ======
-function PrimaryButton({ href, children, external = false }: { href: string; children: React.ReactNode; external?: boolean }) {
-  const base =
-    "rounded-full px-7 py-3 font-semibold shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#C79C2C] text-[#1B3A57] border border-[#D4AF37]/40 hover:scale-105 hover:shadow-2xl hover:from-[#C79C2C] hover:to-[#D4AF37] relative overflow-hidden";
-  return external ? (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className={base}
-    >
-      <span className="relative z-10">{children}</span>
-      {/* Shine effect */}
-      <span className="absolute left-0 top-0 w-full h-full pointer-events-none">
-        <span className="block w-1/2 h-full bg-gradient-to-r from-white/30 to-transparent blur-sm opacity-0 group-hover:opacity-60 transition duration-300" />
-      </span>
-    </a>
-  ) : (
-    <Link href={href} className={base}>
-      <span className="relative z-10">{children}</span>
-      <span className="absolute left-0 top-0 w-full h-full pointer-events-none">
-        <span className="block w-1/2 h-full bg-gradient-to-r from-white/30 to-transparent blur-sm opacity-0 group-hover:opacity-60 transition duration-300" />
-      </span>
-    </Link>
-  );
-}
-
 // ====== Quick Intro Section ======
 function QuickIntro() {
   const ref = useFadeInOnScroll(200);
   return (
-    <section ref={ref} className="py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
+    <section ref={ref} className="py-10 sm:py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
       {/* Subtle gold pattern */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
       {/* Abstract Mediterranean lines/shapes */}
       <div className="absolute left-0 top-0 w-full h-full pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute top-0 left-0 w-full h-32 md:h-48">
+        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute top-0 left-0 w-full h-16 sm:h-32 md:h-48">
           <path fill="#D4AF37" fillOpacity="0.08" d="M0,64L80,74.7C160,85,320,107,480,117.3C640,128,800,128,960,117.3C1120,107,1280,85,1360,74.7L1440,64L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
         </svg>
-        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-24 md:h-32">
+        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-10 sm:h-24 md:h-32">
           <path fill="#C79C2C" fillOpacity="0.07" d="M0,288L80,272C160,256,320,224,480,218.7C640,213,800,235,960,229.3C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
         </svg>
       </div>
-      <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1B3A57] mb-4 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#1B3A57] mb-4 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Authentic &amp; Artisanal
         </h2>
-        <p className="text-lg md:text-xl text-[#5A6B7C] leading-relaxed mb-2 font-sans drop-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
+        <p className="text-base sm:text-lg md:text-xl text-[#5A6B7C] leading-relaxed mb-2 font-sans drop-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
           At Ingrid Bakes, every dessert is a celebration of Mediterranean tradition and luxury. We use only the finest ingredients—no artificial colors, ever—for a cozy, unforgettable café experience.
         </p>
       </div>
@@ -197,13 +337,13 @@ function QuickIntro() {
   );
 }
 
-// ====== Gallery Image Card (Refactored for hook) ======
+// ====== Gallery Image Card ======
 function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string; direction: 'left' | 'right'; rotate: string; delay: number; alt: string }) {
   const ref = useFadeInOnScroll(delay, direction);
   return (
     <div
       ref={ref}
-      className={`relative w-full h-64 rounded-2xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 group ${rotate}`}
+      className={`relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden shadow-lg opacity-0 transition-all duration-700 group ${rotate}`}
       style={{
         background: "linear-gradient(135deg,#fff8e1 0%, #f7f5f2 100%)",
       }}
@@ -213,6 +353,7 @@ function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string;
         alt={alt}
         fill
         className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+        sizes="100vw"
       />
       <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-2xl" />
     </div>
@@ -222,25 +363,25 @@ function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string;
 // ====== Gallery Section ======
 function GallerySection() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
+    <section className="py-10 sm:py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
       {/* Decorative shapes */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
       {/* Abstract Mediterranean lines/shapes for integration */}
       <div className="absolute left-0 top-0 w-full h-full pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute top-0 left-0 w-full h-24 md:h-32">
+        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute top-0 left-0 w-full h-10 sm:h-24 md:h-32">
           <path fill="#D4AF37" fillOpacity="0.07" d="M0,64L80,74.7C160,85,320,107,480,117.3C640,128,800,128,960,117.3C1120,107,1280,85,1360,74.7L1440,64L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
         </svg>
       </div>
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
-        <div className="mb-12 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1B3A57] drop-shadow-sm mb-2 animate-fade-in">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="mb-8 sm:mb-12 text-center">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#1B3A57] drop-shadow-sm mb-2 animate-fade-in">
             Bakery Gallery
           </h2>
-          <p className="text-[#5A6B7C] text-lg md:text-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <p className="text-base sm:text-lg md:text-xl text-[#5A6B7C] animate-fade-in" style={{ animationDelay: "0.2s" }}>
             A glimpse inside our Mediterranean-inspired bakery.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {galleryImages.map((src, i) => {
             const direction: 'left' | 'right' = i % 2 === 0 ? 'left' : 'right';
             const rotate = i % 2 === 0 ? "-rotate-2" : "rotate-2";
@@ -261,33 +402,33 @@ function GallerySection() {
   );
 }
 
-// ====== Dessert Card (Refactored for hook) ======
+// ====== Dessert Card ======
 function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; delay: number }) {
   const ref = useFadeInOnScroll(delay, 'up');
   return (
     <div
       ref={ref}
-      className="group relative rounded-2xl p-5 bg-white/80 border border-[#D4AF37]/30 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 hover:scale-[1.04] flex flex-col items-center opacity-0 translate-y-8"
+      className="group relative rounded-2xl p-4 sm:p-5 bg-white/80 border border-[#D4AF37]/30 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 hover:scale-[1.04] flex flex-col items-center opacity-0 translate-y-8"
       style={{
         background: "linear-gradient(135deg, #fff8e1 0%, #f7f5f2 100%)",
       }}
     >
-      <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden mb-4">
+      <div className="relative w-full h-40 sm:h-48 md:h-56 rounded-xl overflow-hidden mb-3 sm:mb-4">
         <Image
           src={dessert.image}
           alt={dessert.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 25vw"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-[#D4AF37]/10 pointer-events-none rounded-xl" />
       </div>
-      <h3 className="font-serif text-lg md:text-xl text-[#1B3A57] font-semibold mb-1 text-center drop-shadow-sm animate-fade-in">
+      <h3 className="font-serif text-base sm:text-lg md:text-xl text-[#1B3A57] font-semibold mb-1 text-center drop-shadow-sm animate-fade-in">
         {dessert.name}
       </h3>
-      <p className="text-sm text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>{dessert.desc}</p>
-      <div className="mt-auto flex justify-center">
-        <PrimaryButton href="/menu">View details</PrimaryButton>
+      <p className="text-xs sm:text-sm md:text-base text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>{dessert.desc}</p>
+      <div className="mt-auto flex justify-center w-full">
+        <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">View details</LuxuryBakeryButton>
       </div>
     </div>
   );
@@ -296,19 +437,19 @@ function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; 
 // ====== Featured Desserts Section ======
 function FeaturedDesserts() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative">
+    <section className="py-10 sm:py-16 md:py-24 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative">
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
       {/* Abstract Mediterranean lines/shapes */}
       <div className="absolute left-0 top-0 w-full h-full pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-24 md:h-32">
+        <svg width="100%" height="100%" viewBox="0 0 1440 320" fill="none" className="absolute bottom-0 left-0 w-full h-10 sm:h-24 md:h-32">
           <path fill="#D4AF37" fillOpacity="0.07" d="M0,288L80,272C160,256,320,224,480,218.7C640,213,800,235,960,229.3C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
         </svg>
       </div>
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
-        <h2 className="text-center font-serif text-3xl md:text-4xl font-bold mb-12 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <h2 className="text-center font-serif text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Our Featured Desserts
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {featuredDesserts.map((dessert, idx) => (
             <DessertCard key={dessert.name} dessert={dessert} delay={idx * 150} />
           ))}
@@ -322,26 +463,48 @@ function FeaturedDesserts() {
 function MapSection() {
   const ref = useFadeInOnScroll(200);
   return (
-    <section ref={ref} className="py-16 md:py-24 bg-gradient-to-br from-[#f7f5f2] via-[#fff8e1] to-[#f7f5f2] relative">
+    <section ref={ref} className="py-10 sm:py-16 md:py-24 bg-gradient-to-br from-[#f7f5f2] via-[#fff8e1] to-[#f7f5f2] relative">
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
-      <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1B3A57] mb-4 drop-shadow-sm animate-fade-in">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#1B3A57] mb-4 drop-shadow-sm animate-fade-in">
           Visit Us
         </h2>
-        <p className="text-lg text-[#5A6B7C] mb-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          Find Ingrid Bakes in Limassol, Cyprus. Tap the map for directions!
+        <p className="text-base sm:text-lg md:text-xl text-[#5A6B7C] mb-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          Find Ingrid Bakes in Nicosia, Cyprus. Tap the map for directions!
         </p>
-        <div className="w-full max-w-xl mx-auto rounded-2xl overflow-hidden shadow-lg border-4 border-[#D4AF37] hover:scale-105 transition-transform bg-[#fff8e1]/80">
-          <iframe
-            title="Bakery Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3272.045154963579!2d33.0457!3d34.6847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14e770e3e3e3e3e3%3A0x3e3e3e3e3e3e3e3e!2sLimassol%2C%20Cyprus!5e0!3m2!1sen!2s!4v1680000000000!5m2!1sen!2s"
-            width="100%"
-            height="300"
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
+        <div
+          className="w-full max-w-xl mx-auto rounded-2xl overflow-hidden relative"
+          style={{
+            background: "linear-gradient(135deg, #fff8e1 0%, #f7f5f2 100%)",
+            border: "2px solid #D4AF37",
+            boxShadow: "0 4px 24px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.08)",
+          }}
+        >
+          {/* Gold shimmer accent */}
+          <span
+            className="absolute top-0 left-0 w-16 h-2 bg-gradient-to-r from-[#D4AF37]/60 to-transparent rounded-t-2xl pointer-events-none"
+            style={{ zIndex: 2 }}
           />
+          <div className="w-full aspect-[16/9]">
+            <iframe
+              title="Bakery Location"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3272.045154963579!2d33.0457!3d34.6847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14e770e3e3e3e3e3%3A0x3e3e3e3e3e3e3e3e!2sLimassol%2C%20Cyprus!5e0!3m2!1sen!2s!4v1680000000000!5m2!1sen!2s"
+              width="100%"
+              height="100%"
+              style={{
+                border: 0,
+                borderRadius: "1rem",
+                position: "relative",
+                zIndex: 2,
+                background: "transparent",
+                width: "100%",
+                height: "100%",
+              }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
           <a
             href="https://goo.gl/maps/2nQ2wQvJQwqF6QbJ8"
             target="_blank"
@@ -349,6 +512,7 @@ function MapSection() {
             aria-label="Open Ingrid Bakes on Google Maps"
             className="absolute inset-0"
             tabIndex={-1}
+            style={{ zIndex: 3 }}
           />
         </div>
       </div>
@@ -362,21 +526,46 @@ function CTASection() {
   return (
     <section
       ref={ref}
-      className="py-16 md:py-24 text-center bg-gradient-to-r from-[#D4AF37] via-[#C79C2C] to-[#fff8e1] relative"
+      className="relative py-10 sm:py-16 md:py-24 flex items-center justify-center"
     >
-      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
-      {/* Decorative shine */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-white/40 to-transparent rounded-t-xl" />
-      <div className="max-w-3xl mx-auto px-6 relative z-10">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
+      {/* Cream-to-gold gradient background */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#fff8e1] via-[#f7e7b2] to-[#ecd98a]" />
+      {/* Thin gold border/frame */}
+      <div className="absolute inset-0 z-10 rounded-2xl border border-[#D4AF37] pointer-events-none" />
+      {/* Subtle gold swirl SVG (croissant/floral) */}
+      <svg
+        className="absolute left-4 bottom-4 w-16 sm:w-24 h-16 sm:h-24 opacity-20 z-20 pointer-events-none"
+        viewBox="0 0 100 100"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M20 80 Q50 20 80 80"
+          stroke="#D4AF37"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M35 70 Q50 40 65 70"
+          stroke="#C79C2C"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-30">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-[#1B3A57] tracking-wide animate-fade-in">
           Order a Cake or Pastry
         </h2>
-        <p className="mt-2 max-w-2xl mx-auto text-lg md:text-xl text-[#1B3A57]/90 mb-8 font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>
+        <p className="mt-2 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-[#1B3A57]/90 mb-6 sm:mb-8 font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>
           Experience the warmth and luxury of Ingrid Bakes.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <PrimaryButton href="https://wa.me/35799127455" external>Order Now</PrimaryButton>
-          <PrimaryButton href="/menu">View Menu</PrimaryButton>
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 w-full">
+          <LuxuryBakeryButton href="https://wa.me/35799127455" external className="w-full sm:w-auto">Order Now</LuxuryBakeryButton>
+          <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">View Menu</LuxuryBakeryButton>
         </div>
       </div>
     </section>
@@ -386,28 +575,33 @@ function CTASection() {
 // ====== Footer ======
 function Footer() {
   return (
-    <footer className="bg-[#1B3A57] text-white py-10 px-6 mt-0 relative">
+    <footer className="bg-[#1B3A57] text-white py-8 sm:py-10 px-4 sm:px-6 mt-0 relative">
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
+      {/* Decorative gold swirl */}
+      <svg className="absolute right-4 sm:right-8 top-4 sm:top-8 w-16 sm:w-24 h-16 sm:h-24 opacity-10 pointer-events-none" viewBox="0 0 100 100" fill="none">
+        <path d="M20 80 Q50 20 80 80" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <circle cx="50" cy="50" r="8" fill="#D4AF37" fillOpacity="0.08" />
+      </svg>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
         <div className="flex flex-col items-center md:items-start">
-          <span className="font-serif text-xl font-bold text-[#D4AF37] mb-2">Ingrid Bakes</span>
-          <span className="text-sm font-sans">Mediterranean Café &amp; Bakery</span>
-          <span className="text-sm font-sans mt-2">Limassol, Cyprus</span>
-          <span className="text-sm font-sans mt-1">357 99127455</span>
-          <span className="text-sm font-sans mt-1">info@ingridbakes.com</span>
+          <span className="font-serif text-lg sm:text-xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] mb-2">Ingrid Bakes</span>
+          <span className="text-xs sm:text-sm font-sans">Mediterranean Café &amp; Bakery</span>
+          <span className="text-xs sm:text-sm font-sans mt-2">Limassol, Cyprus</span>
+          <span className="text-xs sm:text-sm font-sans mt-1">357 99127455</span>
+          <span className="text-xs sm:text-sm font-sans mt-1">info@ingridbakes.com</span>
         </div>
-        <div className="flex flex-col items-center md:items-end gap-2">
-          <Link href="/menu" className="text-white/80 hover:text-[#D4AF37] transition-colors hover:underline underline-offset-4">Menu</Link>
-          <Link href="/gallery" className="text-white/80 hover:text-[#D4AF37] transition-colors hover:underline underline-offset-4">Gallery</Link>
-          <Link href="/reviews" className="text-white/80 hover:text-[#D4AF37] transition-colors hover:underline underline-offset-4">Reviews</Link>
-          <Link href="/contact" className="text-white/80 hover:text-[#D4AF37] transition-colors hover:underline underline-offset-4">Contact</Link>
-          <PrimaryButton href="https://wa.me/35799127455" external>
+        <div className="flex flex-col items-center md:items-end gap-2 w-full md:w-auto">
+          <Link href="/menu" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Menu</Link>
+          <Link href="/gallery" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Gallery</Link>
+          <Link href="/reviews" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Reviews</Link>
+          <Link href="/contact" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Contact</Link>
+          <LuxuryBakeryButton href="https://wa.me/35799127455" external className="mt-2 w-full sm:w-auto">
             <span className="text-sm font-semibold">WhatsApp Order</span>
             <span aria-hidden>&#128172;</span>
-          </PrimaryButton>
+          </LuxuryBakeryButton>
         </div>
       </div>
-      <div className="mt-8 text-center text-xs text-white/60 font-sans relative z-10">
+      <div className="mt-6 sm:mt-8 text-center text-xs text-white/60 font-sans relative z-10">
         &copy; {new Date().getFullYear()} Ingrid Bakes. All rights reserved.
       </div>
     </footer>
@@ -417,7 +611,7 @@ function Footer() {
 // ====== Main Home Page ======
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#fff8e1] text-[#1B3A57] font-sans">
+    <div className="flex flex-col min-h-screen bg-[#fff8e1] text-[#1B3A57] font-sans overflow-x-hidden">
       <Navbar />
       <main style={{ paddingTop: 'var(--nav-h)' }} className="flex-grow">
         <Hero />
@@ -440,6 +634,33 @@ export default function Home() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        .luxury-btn:active {
+          filter: brightness(0.97);
+        }
+        .luxury-nav-link {
+          position: relative;
+          transition: color 0.2s, background 0.2s;
+        }
+        .luxury-nav-link::after {
+          content: "";
+          display: block;
+          position: absolute;
+          left: 0; bottom: 0;
+          width: 100%;
+          height: 2px;
+          background: linear-gradient(90deg,#D4AF37 0%,#e6c76e 100%);
+          opacity: 0;
+          transform: scaleX(0);
+          transition: opacity 0.2s, transform 0.2s;
+        }
+        .luxury-nav-link:hover::after, .luxury-nav-link:focus::after {
+          opacity: 1;
+          transform: scaleX(1);
+        }
+        html, body {
+          max-width: 100vw;
+          overflow-x: hidden;
         }
       `}</style>
     </div>
