@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
 
 // ====== GALLERY & DESSERT ARRAYS ======
 const galleryImages: string[] = [
@@ -62,18 +61,26 @@ const featuredDesserts: { name: string; desc: string; image: string }[] = [
 ];
 
 // ====== Animation Hook ======
-function useFadeInOnScroll(delay = 0, direction: 'left' | 'right' | 'up' = 'up') {
+function useFadeInOnScroll(
+  delay = 0,
+  direction: "left" | "right" | "up" = "up"
+): React.RefObject<HTMLDivElement> {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const translateClass =
-      direction === 'left'
-        ? 'translate-x-8'
-        : direction === 'right'
-        ? '-translate-x-8'
-        : 'translate-y-6';
-    el.classList.add("opacity-0", translateClass, "transition-all", "duration-700");
+      direction === "left"
+        ? "translate-x-8"
+        : direction === "right"
+        ? "-translate-x-8"
+        : "translate-y-6";
+    el.classList.add(
+      "opacity-0",
+      translateClass,
+      "transition-all",
+      "duration-700"
+    );
     const onScroll = () => {
       const rect = el.getBoundingClientRect();
       if (rect.top < window.innerHeight - 80) {
@@ -90,17 +97,19 @@ function useFadeInOnScroll(delay = 0, direction: 'left' | 'right' | 'up' = 'up')
 }
 
 // ====== Luxury Bakery Button ======
+type LuxuryBakeryButtonProps = {
+  href: string;
+  children: React.ReactNode;
+  external?: boolean;
+  className?: string;
+};
+
 function LuxuryBakeryButton({
   href,
   children,
   external = false,
   className = "",
-}: {
-  href: string;
-  children: React.ReactNode;
-  external?: boolean;
-  className?: string;
-}) {
+}: LuxuryBakeryButtonProps) {
   // Slightly smaller on mobile, gold shimmer accent, smooth scale
   const base =
     "luxury-btn relative rounded-full px-4 py-2 sm:px-7 sm:py-3 font-bold text-[#2d210a] text-sm sm:text-lg shadow-[0_2px_12px_rgba(212,175,55,0.10)] " +
@@ -110,14 +119,17 @@ function LuxuryBakeryButton({
     "tracking-wider w-full sm:w-auto min-h-[40px] " +
     className;
 
-  const textClass = "relative z-10 font-bold tracking-wider font-[Playfair_Display,serif]";
+  const textClass =
+    "relative z-10 font-bold tracking-wider font-[Playfair_Display,serif]";
 
   const ButtonContent = (
     <>
       <span className={textClass}>{children}</span>
-      <span className="absolute inset-0 pointer-events-none rounded-full"
+      <span
+        className="absolute inset-0 pointer-events-none rounded-full"
         style={{
-          background: "repeating-linear-gradient(135deg,rgba(255,255,220,0.10) 0px,rgba(212,175,55,0.12) 8px,rgba(255,255,220,0.10) 16px)",
+          background:
+            "repeating-linear-gradient(135deg,rgba(255,255,220,0.10) 0px,rgba(212,175,55,0.12) 8px,rgba(255,255,220,0.10) 16px)",
           mixBlendMode: "soft-light",
         }}
       />
@@ -129,43 +141,39 @@ function LuxuryBakeryButton({
           animation: shimmerLuxuryBtn 1.2s linear forwards;
         }
         @keyframes shimmerLuxuryBtn {
-          0% { transform: translateX(-60%); opacity: 0.4; }
-          40% { opacity: 0.8; }
-          100% { transform: translateX(60%); opacity: 0; }
+          0% {
+            transform: translateX(-60%);
+            opacity: 0.4;
+          }
+          40% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(60%);
+            opacity: 0;
+          }
         }
       `}</style>
     </>
   );
 
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={base}
+        aria-label={typeof children === "string" ? children : undefined}
+      >
+        {ButtonContent}
+      </a>
+    );
+  }
   return (
-    <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap"
-          rel="stylesheet"
-        />
-        <style>{`
-          .font-[Playfair_Display,serif] {
-            font-family: 'Playfair Display', serif !important;
-          }
-        `}</style>
-      </Head>
-      {external ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          className={base}
-          aria-label={typeof children === "string" ? children : undefined}
-        >
-          {ButtonContent}
-        </a>
-      ) : (
-        <Link href={href} className={base}>
-          {ButtonContent}
-        </Link>
-      )}
-    </>
+    <Link href={href} className={base}>
+      {ButtonContent}
+    </Link>
   );
 }
 
@@ -181,11 +189,14 @@ function Navbar() {
 
   return (
     <nav
-      style={{ height: 'var(--nav-h)' }}
+      style={{ height: "var(--nav-h)" }}
       className="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-br from-[#102233] via-[#153445] to-[#0f2433] border-b border-white/5 bg-opacity-95 shadow-lg"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
-        <Link href="/" className="flex-1 flex items-center justify-center sm:justify-start gap-2">
+        <Link
+          href="/"
+          className="flex-1 flex items-center justify-center sm:justify-start gap-2"
+        >
           <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] tracking-wide">
             Ingrid Bakes
           </span>
@@ -221,7 +232,11 @@ function Navbar() {
         className={`md:hidden absolute left-0 top-full w-full transition-all duration-300 overflow-hidden ${
           open ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
         }`}
-        style={{ boxShadow: open ? "0 8px 32px rgba(212,175,55,0.10)" : undefined }}
+        style={{
+          boxShadow: open
+            ? "0 8px 32px rgba(212,175,55,0.10)"
+            : undefined,
+        }}
       >
         <div className="bg-[#fff8e1] rounded-b-2xl py-2 px-4 flex flex-col gap-1 border-t border-[#e6c76e]">
           {navLinks.map((item, idx) => (
@@ -246,8 +261,14 @@ function Navbar() {
         </div>
         <style jsx>{`
           @keyframes mobileLinkIn {
-            0% { opacity: 0; transform: translateY(24px) scale(0.96);}
-            100% { opacity: 1; transform: translateY(0) scale(1);}
+            0% {
+              opacity: 0;
+              transform: translateY(24px) scale(0.96);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
           }
           .animate-mobile-link {
             animation: mobileLinkIn 0.5s cubic-bezier(.4,0,.2,1) forwards;
@@ -255,9 +276,26 @@ function Navbar() {
         `}</style>
       </div>
       {/* Decorative gold sparkles */}
-      <svg className="absolute right-8 top-2 w-12 h-12 opacity-10 pointer-events-none" viewBox="0 0 48 48" fill="none">
-        <circle cx="24" cy="24" r="20" stroke="#D4AF37" strokeWidth="2" strokeDasharray="4 6" />
-        <circle cx="24" cy="24" r="6" fill="#D4AF37" fillOpacity="0.12" />
+      <svg
+        className="absolute right-8 top-2 w-12 h-12 opacity-10 pointer-events-none"
+        viewBox="0 0 48 48"
+        fill="none"
+      >
+        <circle
+          cx="24"
+          cy="24"
+          r="20"
+          stroke="#D4AF37"
+          strokeWidth="2"
+          strokeDasharray="4 6"
+        />
+        <circle
+          cx="24"
+          cy="24"
+          r="6"
+          fill="#D4AF37"
+          fillOpacity="0.12"
+        />
       </svg>
     </nav>
   );
@@ -285,9 +323,25 @@ function Hero() {
       {/* Gradient overlay for readability */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
       {/* Decorative gold swirl */}
-      <svg className="absolute right-4 bottom-4 w-20 sm:w-32 h-20 sm:h-32 opacity-10 pointer-events-none" viewBox="0 0 100 100" fill="none">
-        <path d="M20 80 Q50 20 80 80" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <circle cx="50" cy="50" r="8" fill="#D4AF37" fillOpacity="0.08" />
+      <svg
+        className="absolute right-4 bottom-4 w-20 sm:w-32 h-20 sm:h-32 opacity-10 pointer-events-none"
+        viewBox="0 0 100 100"
+        fill="none"
+      >
+        <path
+          d="M20 80 Q50 20 80 80"
+          stroke="#D4AF37"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r="8"
+          fill="#D4AF37"
+          fillOpacity="0.08"
+        />
       </svg>
       {/* Content */}
       <div
@@ -295,9 +349,11 @@ function Hero() {
         className="relative z-20 px-4 sm:px-6 text-center max-w-3xl flex flex-col items-center"
       >
         {/* Creamy rectangle with gold border */}
-        <div className="bg-[#fff8e1]/80 rounded-xl px-4 sm:px-8 py-8 sm:py-10 shadow-2xl border-2 border-[#D4AF37] relative backdrop-blur-0 animate-fade-in-up"
+        <div
+          className="bg-[#fff8e1]/80 rounded-xl px-4 sm:px-8 py-8 sm:py-10 shadow-2xl border-2 border-[#D4AF37] relative backdrop-blur-0 animate-fade-in-up"
           style={{
-            boxShadow: "0 8px 32px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.10)",
+            boxShadow:
+              "0 8px 32px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.10)",
           }}
         >
           {/* Decorative gold shine top left */}
@@ -305,13 +361,27 @@ function Hero() {
           <h1 className="font-serif text-2xl sm:text-4xl md:text-6xl font-bold text-[#1B3A57] drop-shadow-[0_10px_25px_rgba(212,175,55,0.25)] mb-4 leading-tight animate-fade-in-up">
             Ingrid Bakes
           </h1>
-          <p className="text-base sm:text-lg md:text-2xl text-[#1B3A57]/90 max-w-2xl mx-auto mb-6 sm:mb-8 drop-shadow font-sans leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+          <p
+            className="text-base sm:text-lg md:text-2xl text-[#1B3A57]/90 max-w-2xl mx-auto mb-6 sm:mb-8 drop-shadow font-sans leading-relaxed animate-fade-in-up"
+            style={{ animationDelay: "0.15s" }}
+          >
             Luxurious cakes &amp; pastries, crafted with Mediterranean soul. Cozy interiors, golden moments.
           </p>
           {/* Buttons stack vertically on mobile, inline on desktop */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 justify-center w-full animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-            <LuxuryBakeryButton href="/menu" className="sm:w-auto w-full">Explore Menu</LuxuryBakeryButton>
-            <LuxuryBakeryButton href="https://wa.me/35799127455" external className="sm:w-auto w-full">Order Now</LuxuryBakeryButton>
+          <div
+            className="flex flex-col gap-2 sm:flex-row sm:gap-4 justify-center w-full animate-fade-in-up"
+            style={{ animationDelay: "0.3s" }}
+          >
+            <LuxuryBakeryButton href="/menu" className="sm:w-auto w-full">
+              Explore Menu
+            </LuxuryBakeryButton>
+            <LuxuryBakeryButton
+              href="https://wa.me/35799127455"
+              external
+              className="sm:w-auto w-full"
+            >
+              Order Now
+            </LuxuryBakeryButton>
           </div>
         </div>
       </div>
@@ -336,15 +406,21 @@ function Hero() {
 function QuickIntro() {
   const ref = useFadeInOnScroll(200);
   return (
-    <section ref={ref} className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
+    <section
+      ref={ref}
+      className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden"
+    >
       {/* Reduced vertical padding for mobile */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] mb-2 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Authentic &amp; Artisanal
         </h2>
-        <p className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] leading-relaxed mb-2 font-sans drop-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          At Ingrid Bakes, every dessert is a celebration of Mediterranean tradition and luxury. We use only the finest ingredients—no artificial colors, ever—for a cozy, unforgettable café experience.
+        <p
+          className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] leading-relaxed mb-2 font-sans drop-shadow animate-fade-in"
+          style={{ animationDelay: "0.2s" }}
+        >
+          At Ingrid Bakes, every dessert is a celebration of Mediterranean tradition and luxury. We use only the finest ingredients&#8212;no artificial colors, ever&#8212;for a cozy, unforgettable café experience.
         </p>
       </div>
     </section>
@@ -352,7 +428,21 @@ function QuickIntro() {
 }
 
 // ====== Gallery Image Card ======
-function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string; direction: 'left' | 'right'; rotate: string; delay: number; alt: string }) {
+type GalleryImageCardProps = {
+  src: string;
+  direction: "left" | "right";
+  rotate: string;
+  delay: number;
+  alt: string;
+};
+
+function GalleryImageCard({
+  src,
+  direction,
+  rotate,
+  delay,
+  alt,
+}: GalleryImageCardProps) {
   const ref = useFadeInOnScroll(delay, direction);
   return (
     <div
@@ -391,14 +481,14 @@ function GalleryImageCard({ src, direction, rotate, delay, alt }: { src: string;
 // ====== Gallery Section ======
 function GallerySection() {
   // Show only 4 images on mobile, all on desktop
-  const imagesToShow = typeof window !== "undefined" && window.innerWidth < 640
-    ? galleryImages.slice(0, 4)
-    : galleryImages;
-  // Fallback for SSR: always show 4 on mobile, all on desktop
-  const [mobileImages, setMobileImages] = useState(galleryImages.slice(0, 4));
+  const [mobileImages, setMobileImages] = useState<string[]>(
+    galleryImages.slice(0, 4)
+  );
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setMobileImages(window.innerWidth < 640 ? galleryImages.slice(0, 4) : galleryImages);
+      setMobileImages(
+        window.innerWidth < 640 ? galleryImages.slice(0, 4) : galleryImages
+      );
     }
   }, []);
   const images = mobileImages;
@@ -412,14 +502,17 @@ function GallerySection() {
           <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] drop-shadow-sm mb-2 animate-fade-in">
             Bakery Gallery
           </h2>
-          <p className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <p
+            className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] animate-fade-in"
+            style={{ animationDelay: "0.2s" }}
+          >
             A glimpse inside our Mediterranean-inspired bakery.
           </p>
         </div>
         {/* Responsive grid: 1 col mobile, 2 tablet, 3 desktop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
           {images.map((src, i) => {
-            const direction: 'left' | 'right' = i % 2 === 0 ? 'left' : 'right';
+            const direction: "left" | "right" = i % 2 === 0 ? "left" : "right";
             const rotate = i % 2 === 0 ? "-rotate-2" : "rotate-2";
             return (
               <GalleryImageCard
@@ -439,8 +532,13 @@ function GallerySection() {
 }
 
 // ====== Dessert Card ======
-function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; delay: number }) {
-  const ref = useFadeInOnScroll(delay, 'up');
+type DessertCardProps = {
+  dessert: { name: string; desc: string; image: string };
+  delay: number;
+};
+
+function DessertCard({ dessert, delay }: DessertCardProps) {
+  const ref = useFadeInOnScroll(delay, "up");
   return (
     <div
       ref={ref}
@@ -460,9 +558,16 @@ function DessertCard({ dessert, delay }: { dessert: typeof featuredDesserts[0]; 
       <h3 className="font-serif text-sm sm:text-lg md:text-xl text-[#1B3A57] font-semibold mb-1 text-center drop-shadow-sm animate-fade-in">
         {dessert.name}
       </h3>
-      <p className="text-xs sm:text-sm md:text-base text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>{dessert.desc}</p>
+      <p
+        className="text-xs sm:text-sm md:text-base text-[#5A6B7C] mb-2 text-center font-sans animate-fade-in"
+        style={{ animationDelay: "0.2s" }}
+      >
+        {dessert.desc}
+      </p>
       <div className="mt-auto flex justify-center w-full">
-        <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">View details</LuxuryBakeryButton>
+        <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">
+          View details
+        </LuxuryBakeryButton>
       </div>
       <style jsx>{`
         .animate-fade-in-up {
@@ -507,14 +612,20 @@ function MapSection() {
   const ref = useFadeInOnScroll(200);
   // Google Maps embed with pan/zoom enabled
   return (
-    <section ref={ref} className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#f7f5f2] via-[#fff8e1] to-[#f7f5f2] relative">
+    <section
+      ref={ref}
+      className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#f7f5f2] via-[#fff8e1] to-[#f7f5f2] relative"
+    >
       {/* Mobile-first: reduced vertical padding */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] mb-2 drop-shadow-sm animate-fade-in">
           Visit Us
         </h2>
-        <p className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] mb-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+        <p
+          className="text-sm sm:text-lg md:text-xl text-[#5A6B7C] mb-4 animate-fade-in"
+          style={{ animationDelay: "0.2s" }}
+        >
           Find Ingrid Bakes in Nicosia, Cyprus. Pan and zoom the map below!
         </p>
         <div
@@ -522,7 +633,8 @@ function MapSection() {
           style={{
             background: "linear-gradient(135deg, #fff8e1 0%, #f7f5f2 100%)",
             border: "2px solid #D4AF37",
-            boxShadow: "0 4px 24px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.08)",
+            boxShadow:
+              "0 4px 24px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.08)",
           }}
         >
           {/* Gold shimmer accent */}
@@ -533,7 +645,7 @@ function MapSection() {
           <div className="w-full aspect-[16/9]">
             <iframe
               title="Bakery Location"
-              src="https://www.google.com/maps?q=Λεωφ.+Αρχιεπισκόπου+Μακαρίου+Γ'+51,+Nicosia+1070,+Cyprus&output=embed"
+              src="https://www.google.com/maps?q=%CE%9B%CE%B5%CF%89%CF%86.+%CE%91%CF%81%CF%87%CE%B9%CE%B5%CF%80%CE%B9%CF%83%CE%BA%CE%BF%CF%80%CE%BF%CF%85+%CE%9C%CE%B1%CE%BA%CE%B1%CF%81%CE%AF%CE%BF%CF%85+%CE%93'+51,+Nicosia+1070,+Cyprus&output=embed"
               width="100%"
               height="100%"
               style={{
@@ -545,7 +657,7 @@ function MapSection() {
                 width: "100%",
                 height: "100%",
               }}
-              allowFullScreen={true}
+              allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
@@ -594,13 +706,24 @@ function CTASection() {
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold mb-2 text-[#1B3A57] tracking-wide animate-fade-in">
           Order a Cake or Pastry
         </h2>
-        <p className="mt-2 max-w-2xl mx-auto text-sm sm:text-lg md:text-xl text-[#1B3A57]/90 mb-4 sm:mb-8 font-sans animate-fade-in" style={{ animationDelay: "0.2s" }}>
+        <p
+          className="mt-2 max-w-2xl mx-auto text-sm sm:text-lg md:text-xl text-[#1B3A57]/90 mb-4 sm:mb-8 font-sans animate-fade-in"
+          style={{ animationDelay: "0.2s" }}
+        >
           Experience the warmth and luxury of Ingrid Bakes.
         </p>
         {/* Buttons stack vertically on mobile, inline on desktop */}
         <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-4 w-full">
-          <LuxuryBakeryButton href="https://wa.me/35799127455" external className="w-full sm:w-auto">Order Now</LuxuryBakeryButton>
-          <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">View Menu</LuxuryBakeryButton>
+          <LuxuryBakeryButton
+            href="https://wa.me/35799127455"
+            external
+            className="w-full sm:w-auto"
+          >
+            Order Now
+          </LuxuryBakeryButton>
+          <LuxuryBakeryButton href="/menu" className="w-full sm:w-auto">
+            View Menu
+          </LuxuryBakeryButton>
         </div>
       </div>
     </section>
@@ -613,25 +736,75 @@ function Footer() {
     <footer className="bg-[#1B3A57] text-white py-4 sm:py-8 px-4 sm:px-6 mt-0 relative">
       {/* Mobile-first: reduced vertical padding */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
-      <svg className="absolute right-4 sm:right-8 top-4 sm:top-8 w-16 sm:w-24 h-16 sm:h-24 opacity-10 pointer-events-none" viewBox="0 0 100 100" fill="none">
-        <path d="M20 80 Q50 20 80 80" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <circle cx="50" cy="50" r="8" fill="#D4AF37" fillOpacity="0.08" />
+      <svg
+        className="absolute right-4 sm:right-8 top-4 sm:top-8 w-16 sm:w-24 h-16 sm:h-24 opacity-10 pointer-events-none"
+        viewBox="0 0 100 100"
+        fill="none"
+      >
+        <path
+          d="M20 80 Q50 20 80 80"
+          stroke="#D4AF37"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r="8"
+          fill="#D4AF37"
+          fillOpacity="0.08"
+        />
       </svg>
       {/* Responsive flex: vertical on mobile, horizontal on desktop */}
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 md:gap-6 relative z-10">
         <div className="flex flex-col items-center md:items-start">
-          <span className="font-serif text-sm sm:text-lg md:text-xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] mb-2">Ingrid Bakes</span>
-          <span className="text-xs sm:text-sm font-sans">Mediterranean Café &amp; Bakery</span>
-          <span className="text-xs sm:text-sm font-sans mt-2">Λεωφ. Αρχιεπισκόπου Μακαρίου Γ' 51, Nicosia</span>
-          <span className="text-xs sm:text-sm font-sans mt-1">357 99127455</span>
-          <span className="text-xs sm:text-sm font-sans mt-1">info@ingridbakes.com</span>
+          <span className="font-serif text-sm sm:text-lg md:text-xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] mb-2">
+            Ingrid Bakes
+          </span>
+          <span className="text-xs sm:text-sm font-sans">
+            Mediterranean Café &amp; Bakery
+          </span>
+          <span className="text-xs sm:text-sm font-sans mt-2">
+            Λεωφ. Αρχιεπισκόπου Μακαρίου Γ&apos; 51, Nicosia
+          </span>
+          <span className="text-xs sm:text-sm font-sans mt-1">
+            357 99127455
+          </span>
+          <span className="text-xs sm:text-sm font-sans mt-1">
+            info@ingridbakes.com
+          </span>
         </div>
         <div className="flex flex-col items-center md:items-end gap-1 w-full md:w-auto">
-          <Link href="/menu" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Menu</Link>
-          <Link href="/gallery" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Gallery</Link>
-          <Link href="/reviews" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Reviews</Link>
-          <Link href="/contact" className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6">Contact</Link>
-          <LuxuryBakeryButton href="https://wa.me/35799127455" external className="mt-2 w-full sm:w-auto">
+          <Link
+            href="/menu"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+          >
+            Menu
+          </Link>
+          <Link
+            href="/gallery"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+          >
+            Gallery
+          </Link>
+          <Link
+            href="/reviews"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+          >
+            Reviews
+          </Link>
+          <Link
+            href="/contact"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+          >
+            Contact
+          </Link>
+          <LuxuryBakeryButton
+            href="https://wa.me/35799127455"
+            external
+            className="mt-2 w-full sm:w-auto"
+          >
             <span className="text-sm font-semibold">WhatsApp Order</span>
             <span aria-hidden>&#128172;</span>
           </LuxuryBakeryButton>
@@ -649,7 +822,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fff8e1] text-[#1B3A57] font-sans overflow-x-hidden">
       <Navbar />
-      <main style={{ paddingTop: 'var(--nav-h)' }} className="flex-grow">
+      <main style={{ paddingTop: "var(--nav-h)" }} className="flex-grow">
         <Hero />
         <QuickIntro />
         <GallerySection />
@@ -682,21 +855,28 @@ export default function Home() {
           content: "";
           display: block;
           position: absolute;
-          left: 0; bottom: 0;
+          left: 0;
+          bottom: 0;
           width: 100%;
           height: 2px;
-          background: linear-gradient(90deg,#D4AF37 0%,#e6c76e 100%);
+          background: linear-gradient(90deg, #D4AF37 0%, #e6c76e 100%);
           opacity: 0;
           transform: scaleX(0);
           transition: opacity 0.2s, transform 0.2s;
         }
-        .luxury-nav-link:hover::after, .luxury-nav-link:focus::after {
+        .luxury-nav-link:hover::after,
+        .luxury-nav-link:focus::after {
           opacity: 1;
           transform: scaleX(1);
         }
-        html, body {
+        html,
+        body {
           max-width: 100vw;
           overflow-x: hidden;
+        }
+        /* Playfair Display font loaded globally via _app or layout */
+        .font-[Playfair_Display,serif] {
+          font-family: 'Playfair Display', serif !important;
         }
       `}</style>
     </div>
