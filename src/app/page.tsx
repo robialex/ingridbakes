@@ -62,10 +62,11 @@ const featuredDesserts: { name: string; desc: string; image: string }[] = [
 
 // ====== Animation Hook ======
 function useFadeInOnScroll(
-  delay = 0,
+  delay: number = 0,
   direction: "left" | "right" | "up" = "up"
 ): React.RefObject<HTMLDivElement> {
   const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -93,7 +94,8 @@ function useFadeInOnScroll(
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, [delay, direction]);
-  return ref;
+
+  return ref as React.RefObject<HTMLDivElement>;
 }
 
 // ====== Luxury Bakery Button ======
