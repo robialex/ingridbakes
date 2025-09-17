@@ -70,29 +70,47 @@ function useFadeInOnScroll(
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Set initial state
     const translateClass =
       direction === "left"
         ? "translate-x-8"
         : direction === "right"
         ? "-translate-x-8"
         : "translate-y-6";
+
     el.classList.add(
       "opacity-0",
       translateClass,
       "transition-all",
       "duration-700"
     );
-    const onScroll = () => {
+
+    // Helper to check if element is in viewport
+    const isInView = () => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 80) {
+      return rect.top < window.innerHeight - 80;
+    };
+
+    // Fade-in logic
+    const fadeIn = () => {
+      if (isInView()) {
         el.classList.add("opacity-100");
-        el.classList.remove(translateClass);
+        el.classList.remove("opacity-0", translateClass);
         el.classList.add("translate-x-0", "translate-y-0");
       }
     };
-    setTimeout(onScroll, delay);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+
+    // Run fadeIn after delay, both on mount and on scroll
+    const onScroll = () => setTimeout(fadeIn, delay);
+
+    // Check immediately on mount
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [delay, direction]);
 
   return ref as React.RefObject<HTMLDivElement>;
@@ -112,7 +130,6 @@ function LuxuryBakeryButton({
   external = false,
   className = "",
 }: LuxuryBakeryButtonProps) {
-  // Slightly smaller on mobile, gold shimmer accent, smooth scale
   const base =
     "luxury-btn relative rounded-full px-4 py-2 sm:px-7 sm:py-3 font-bold text-[#2d210a] text-sm sm:text-lg shadow-[0_2px_12px_rgba(212,175,55,0.10)] " +
     "bg-gradient-to-br from-[#f7e7b2] via-[#e6c76e] to-[#bfa14b] border-2 border-[#e6c76e] " +
@@ -182,6 +199,20 @@ function LuxuryBakeryButton({
 // ====== Responsive Navbar ======
 function Navbar() {
   const [open, setOpen] = useState(false);
+
+  // Add/remove blur class on <body> when menu opens/closes
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("menu-blur");
+    } else {
+      document.body.classList.remove("menu-blur");
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove("menu-blur");
+    };
+  }, [open]);
+
   const navLinks = [
     { name: "Menu", href: "/menu" },
     { name: "Gallery", href: "/gallery" },
@@ -190,137 +221,167 @@ function Navbar() {
   ];
 
   return (
-    <nav
-      style={{ height: "var(--nav-h)" }}
-      className="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-br from-[#102233] via-[#153445] to-[#0f2433] border-b border-white/5 bg-opacity-95 shadow-lg"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex-1 flex items-center justify-center sm:justify-start gap-2"
-        >
-          <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] tracking-wide">
-            Ingrid Bakes
-          </span>
-        </Link>
-        {/* Desktop Links */}
-        <div className="hidden md:flex gap-4 md:gap-6 items-center">
-          {navLinks.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="luxury-nav-link text-[#f7f5f2] font-medium transition-all duration-200 px-2 py-1 rounded hover:text-[#D4AF37] hover:bg-[#fff8e1]/10 hover:underline underline-offset-6"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-        {/* Hamburger for mobile */}
-        <button
-          className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-          aria-label="Open menu"
-          onClick={() => setOpen((o) => !o)}
-        >
-          {/* No circular effect, just icon */}
-          <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
-            <rect y="7" width="32" height="3" rx="1.5" fill="#D4AF37" />
-            <rect y="14" width="32" height="3" rx="1.5" fill="#D4AF37" />
-            <rect y="21" width="32" height="3" rx="1.5" fill="#D4AF37" />
-          </svg>
-        </button>
-      </div>
-      {/* Mobile Dropdown with animated links */}
-      <div
-        className={`md:hidden absolute left-0 top-full w-full transition-all duration-300 overflow-hidden ${
-          open ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-        style={{
-          boxShadow: open
-            ? "0 8px 32px rgba(212,175,55,0.10)"
-            : undefined,
-        }}
+    <>
+      <nav
+        style={{ height: "var(--nav-h)" }}
+        className="fixed top-0 left-0 w-full z-[9999] bg-gradient-to-br from-[#102233] via-[#153445] to-[#0f2433] border-b border-white/5 bg-opacity-95 shadow-lg"
       >
-        <div className="bg-[#fff8e1] rounded-b-2xl py-2 px-4 flex flex-col gap-1 border-t border-[#e6c76e]">
-          {navLinks.map((item, idx) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`w-full py-3 px-2 text-center font-serif font-bold text-base sm:text-lg text-[#1B3A57] hover:text-[#D4AF37] transition-colors min-h-[44px] 
-                transition-all duration-300
-                ${open ? `animate-mobile-link` : ""}`}
-              style={{
-                borderBottom:
-                  idx < navLinks.length - 1
-                    ? "1px solid #e6c76e"
-                    : "none",
-                animationDelay: open ? `${0.1 + idx * 0.08}s` : undefined,
-              }}
-              onClick={() => setOpen(false)}
-            >
-              {item.name}
-            </Link>
-          ))}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+          <Link
+            href="/"
+            className="flex-1 flex items-center justify-center sm:justify-start gap-2"
+          >
+            <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] via-[#e6c76e] to-[#bfa14b] text-transparent bg-clip-text drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)] tracking-wide">
+              Ingrid Bakes
+            </span>
+          </Link>
+          {/* Desktop Links */}
+          <div className="hidden md:flex gap-4 md:gap-6 items-center">
+            {navLinks.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="luxury-nav-link text-[#f7f5f2] font-medium transition-all duration-200 px-2 py-1 rounded hover:text-[#D4AF37] hover:bg-[#fff8e1]/10 hover:underline underline-offset-6"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+          {/* Hamburger for mobile */}
+          <button
+            className={`md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-transform duration-300 ${
+              open ? "rotate-90 scale-110" : ""
+            }`}
+            aria-label="Open menu"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen((o) => !o)}
+          >
+            <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+              <rect y="7" width="32" height="3" rx="1.5" fill="#D4AF37" />
+              <rect y="14" width="32" height="3" rx="1.5" fill="#D4AF37" />
+              <rect y="21" width="32" height="3" rx="1.5" fill="#D4AF37" />
+            </svg>
+          </button>
         </div>
-        <style jsx>{`
-          @keyframes mobileLinkIn {
-            0% {
-              opacity: 0;
-              transform: translateY(24px) scale(0.96);
-            }
-            100% {
-              opacity: 1;
-              transform: translateY(0) scale(1);
-            }
-          }
-          .animate-mobile-link {
-            animation: mobileLinkIn 0.5s cubic-bezier(.4,0,.2,1) forwards;
-          }
-        `}</style>
-      </div>
-      {/* Decorative gold sparkles */}
-      <svg
-        className="absolute right-8 top-2 w-12 h-12 opacity-10 pointer-events-none"
-        viewBox="0 0 48 48"
-        fill="none"
-      >
-        <circle
-          cx="24"
-          cy="24"
-          r="20"
-          stroke="#D4AF37"
-          strokeWidth="2"
-          strokeDasharray="4 6"
-        />
-        <circle
-          cx="24"
-          cy="24"
-          r="6"
-          fill="#D4AF37"
-          fillOpacity="0.12"
-        />
-      </svg>
-    </nav>
+        {/* Mobile Dropdown with animated links */}
+        <div
+          id="mobile-menu"
+          className={`md:hidden fixed inset-0 z-[9998] transition-all duration-500 ${
+            open
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
+          }`}
+        >
+          {/* Backdrop blur */}
+          <div
+            className={`absolute inset-0 bg-black/30 backdrop-blur-[6px] transition-all duration-500 ${
+              open ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+          />
+          {/* Menu panel */}
+          <div
+            className={`absolute top-0 left-0 w-full bg-[#fff8e1] rounded-b-2xl shadow-2xl border-t border-[#e6c76e] px-4 pt-4 pb-8 flex flex-col gap-1 transition-transform duration-500 ${
+              open
+                ? "translate-y-0 opacity-100"
+                : "-translate-y-12 opacity-0"
+            }`}
+            style={{
+              boxShadow: open
+                ? "0 8px 32px rgba(212,175,55,0.10)"
+                : undefined,
+            }}
+          >
+            {navLinks.map((item, idx) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                tabIndex={open ? 0 : -1}
+                className={`w-full py-3 px-2 text-center font-serif font-bold text-base sm:text-lg text-[#1B3A57] hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors min-h-[44px] rounded-lg outline-none
+                  transition-all duration-300
+                  ${open ? `animate-mobile-link` : ""}`}
+                style={{
+                  borderBottom:
+                    idx < navLinks.length - 1
+                      ? "1px solid #e6c76e"
+                      : "none",
+                  animationDelay: open ? `${0.1 + idx * 0.08}s` : undefined,
+                }}
+                onClick={() => setOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+        {/* Decorative gold sparkles */}
+        <svg
+          className="absolute right-8 top-2 w-12 h-12 opacity-10 pointer-events-none"
+          viewBox="0 0 48 48"
+          fill="none"
+        >
+          <circle
+            cx="24"
+            cy="24"
+            r="20"
+            stroke="#D4AF37"
+            strokeWidth="2"
+            strokeDasharray="4 6"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="6"
+            fill="#D4AF37"
+            fillOpacity="0.12"
+          />
+        </svg>
+      </nav>
+    </>
   );
 }
 
 // ====== Hero Section ======
 function Hero() {
   const ref = useFadeInOnScroll(0);
+  const heroImgRef = useRef<HTMLDivElement>(null);
+
+  // Parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!heroImgRef.current) return;
+      const scrollY = window.scrollY;
+      heroImgRef.current.style.transform = `translateX(${Math.min(
+        40,
+        scrollY / 12
+      )}px) scale(1.04)`;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <section className="relative h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Move image left on mobile to avoid tree */}
-      <div className="absolute inset-0 z-0">
+      {/* Move image right on mobile, parallax */}
+      <div
+        ref={heroImgRef}
+        className="absolute inset-0 z-0 transition-transform duration-500 will-change-transform"
+        style={{ transform: "translateX(40px) scale(1.04)" }}
+      >
         <Image
           src="/imgs/from-the-outside.jpg"
           alt="Ingrid Bakes exterior"
           fill
           priority
-          className="object-cover object-left sm:object-center"
+          className="object-cover object-right sm:object-center"
           sizes="100vw"
         />
         {/* Decorative gold pattern overlay */}
         <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
+        {/* Subtle gradient overlay for luxury */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#fff8e1]/80 via-transparent to-[#D4AF37]/10 pointer-events-none" />
       </div>
       {/* Gradient overlay for readability */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
@@ -412,8 +473,9 @@ function QuickIntro() {
       ref={ref}
       className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden"
     >
-      {/* Reduced vertical padding for mobile */}
-      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
+      {/* Decorative gradient/pattern overlay */}
+      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] mb-2 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Authentic &amp; Artisanal
@@ -497,8 +559,9 @@ function GallerySection() {
 
   return (
     <section className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden">
-      {/* Mobile-first: reduced vertical padding */}
+      {/* Decorative gradient/pattern overlay */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="mb-4 sm:mb-10 text-center">
           <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] drop-shadow-sm mb-2 animate-fade-in">
@@ -590,21 +653,57 @@ function DessertCard({ dessert, delay }: DessertCardProps) {
 
 // ====== Featured Desserts Section ======
 function FeaturedDesserts() {
+  // Responsive carousel for mobile, grid for desktop
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Scroll snap polyfill for smoothness (optional, but helps on some mobile browsers)
+  useEffect(() => {
+    if (!carouselRef.current) return;
+    carouselRef.current.scrollLeft = 0;
+  }, []);
+
   return (
     <section className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative">
-      {/* Mobile-first: reduced vertical padding */}
+      {/* Decorative gradient/pattern overlay */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         <h2 className="text-center font-serif text-lg sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-10 text-[#1B3A57] drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Our Featured Desserts
         </h2>
-        {/* Responsive grid: 1 col mobile, 2 tablet, 4 desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
+        {/* Carousel on mobile, grid on desktop */}
+        <div className="block md:hidden">
+          <div
+            ref={carouselRef}
+            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
+            style={{ WebkitOverflowScrolling: "touch" }}
+            aria-label="Featured desserts carousel"
+          >
+            {featuredDesserts.map((dessert, idx) => (
+              <div
+                key={dessert.name}
+                className="min-w-[80vw] max-w-[85vw] snap-center flex-shrink-0"
+                style={{ scrollSnapAlign: "center" }}
+              >
+                <DessertCard dessert={dessert} delay={idx * 120} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
           {featuredDesserts.map((dessert, idx) => (
-            <DessertCard key={dessert.name} dessert={dessert} delay={idx * 150} />
+            <DessertCard key={dessert.name} dessert={dessert} delay={idx * 120} />
           ))}
         </div>
       </div>
+      <style jsx>{`
+        .snap-x {
+          scroll-snap-type: x mandatory;
+        }
+        .snap-center {
+          scroll-snap-align: center;
+        }
+      `}</style>
     </section>
   );
 }
@@ -612,14 +711,14 @@ function FeaturedDesserts() {
 // ====== Map Section ======
 function MapSection() {
   const ref = useFadeInOnScroll(200);
-  // Google Maps embed with pan/zoom enabled
   return (
     <section
       ref={ref}
       className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#f7f5f2] via-[#fff8e1] to-[#f7f5f2] relative"
     >
-      {/* Mobile-first: reduced vertical padding */}
+      {/* Decorative gradient/pattern overlay */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-5 mix-blend-soft-light" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] mb-2 drop-shadow-sm animate-fade-in">
           Visit Us
@@ -678,7 +777,7 @@ function CTASection() {
       ref={ref}
       className="relative py-4 sm:py-10 md:py-16 flex items-center justify-center"
     >
-      {/* Mobile-first: reduced vertical padding */}
+      {/* Decorative gradient/pattern overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#fff8e1] via-[#f7e7b2] to-[#ecd98a]" />
       <div className="absolute inset-0 z-10 rounded-2xl border border-[#D4AF37] pointer-events-none" />
       <svg
@@ -736,8 +835,9 @@ function CTASection() {
 function Footer() {
   return (
     <footer className="bg-[#1B3A57] text-white py-4 sm:py-8 px-4 sm:px-6 mt-0 relative">
-      {/* Mobile-first: reduced vertical padding */}
+      {/* Decorative gradient/pattern overlay */}
       <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
       <svg
         className="absolute right-4 sm:right-8 top-4 sm:top-8 w-16 sm:w-24 h-16 sm:h-24 opacity-10 pointer-events-none"
         viewBox="0 0 100 100"
@@ -780,25 +880,25 @@ function Footer() {
         <div className="flex flex-col items-center md:items-end gap-1 w-full md:w-auto">
           <Link
             href="/menu"
-            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
           >
             Menu
           </Link>
           <Link
             href="/gallery"
-            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
           >
             Gallery
           </Link>
           <Link
             href="/reviews"
-            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
           >
             Reviews
           </Link>
           <Link
             href="/contact"
-            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
+            className="luxury-nav-link text-[#f7f5f2] hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors hover:underline underline-offset-6"
           >
             Contact
           </Link>
@@ -823,18 +923,25 @@ function Footer() {
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fff8e1] text-[#1B3A57] font-sans overflow-x-hidden">
-      <Navbar />
-      <main style={{ paddingTop: "var(--nav-h)" }} className="flex-grow">
-        <Hero />
-        <QuickIntro />
-        <GallerySection />
-        <FeaturedDesserts />
-        <MapSection />
-        <CTASection />
-      </main>
-      <Footer />
-      {/* Cinematic fade-in animation */}
+      {/* === GLOBAL STYLES (not nested) === */}
       <style jsx global>{`
+        /* Menu blur effect for mobile menu */
+        body.menu-blur #__next > div:not(nav):not([id="mobile-menu"]),
+        body.menu-blur main,
+        body.menu-blur footer {
+          filter: blur(6px) brightness(0.96);
+          transition: filter 0.4s cubic-bezier(.4,0,.2,1);
+          pointer-events: none;
+          user-select: none;
+        }
+        body:not(.menu-blur) #__next > div:not(nav):not([id="mobile-menu"]),
+        body:not(.menu-blur) main,
+        body:not(.menu-blur) footer {
+          filter: none;
+          pointer-events: auto;
+          user-select: auto;
+        }
+        /* Cinematic fade-in animation */
         .animate-fade-in {
           opacity: 0;
           transform: translateY(24px);
@@ -845,6 +952,20 @@ export default function Home() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        /* Mobile menu link animation */
+        @keyframes mobileLinkIn {
+          0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .animate-mobile-link {
+          animation: mobileLinkIn 0.5s cubic-bezier(.4,0,.2,1) forwards;
         }
         .luxury-btn:active {
           filter: brightness(0.97);
@@ -880,7 +1001,34 @@ export default function Home() {
         .font-[Playfair_Display,serif] {
           font-family: 'Playfair Display', serif !important;
         }
+        /* Premium hover effect for all images and cards */
+        .group:hover img,
+        .group:focus img,
+        .group:hover,
+        .group:focus {
+          box-shadow: 0 6px 32px 0 rgba(212,175,55,0.13), 0 2px 8px 0 rgba(0,0,0,0.10);
+          filter: brightness(1.03) saturate(1.08);
+          transition: box-shadow 0.25s cubic-bezier(.4,0,.2,1), filter 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        .group:active {
+          filter: brightness(0.97);
+        }
+        /* Focus ring for accessibility */
+        .luxury-btn:focus, .luxury-nav-link:focus {
+          outline: 2px solid #D4AF37;
+          outline-offset: 2px;
+        }
       `}</style>
+      <Navbar />
+      <main style={{ paddingTop: "var(--nav-h)" }} className="flex-grow">
+        <Hero />
+        <QuickIntro />
+        <GallerySection />
+        <FeaturedDesserts />
+        <MapSection />
+        <CTASection />
+      </main>
+      <Footer />
     </div>
   );
 }
