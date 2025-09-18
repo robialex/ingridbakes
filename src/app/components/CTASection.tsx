@@ -133,4 +133,4 @@ function CTASection() {
   );
 }
 
-export default
+export default CTASection;
