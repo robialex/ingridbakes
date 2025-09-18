@@ -344,31 +344,16 @@ function Navbar() {
 }
 
 // ====== Hero Section ======
+// Parallax effect removed for static background (fixes unwanted motion and build issues)
 function Hero() {
   const ref = useFadeInOnScroll(0);
-  const heroImgRef = useRef<HTMLDivElement>(null);
-
-  // Parallax effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!heroImgRef.current) return;
-      const scrollY = window.scrollY;
-      heroImgRef.current.style.transform = `translateX(${Math.min(
-        40,
-        scrollY / 12
-      )}px) scale(1.04)`;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <section className="relative h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Move image right on mobile, parallax */}
+      {/* Static background image */}
       <div
-        ref={heroImgRef}
-        className="absolute inset-0 z-0 transition-transform duration-500 will-change-transform"
-        style={{ transform: "translateX(40px) scale(1.04)" }}
+        className="absolute inset-0 z-0"
+        style={{ transform: "scale(1.04)" }}
       >
         <Image
           src="/imgs/from-the-outside.jpg"
@@ -746,7 +731,7 @@ function MapSection() {
           <div className="w-full aspect-[16/9]">
             <iframe
               title="Bakery Location"
-              src="https://www.google.com/maps?q=%CE%9B%CE%B5%CF%89%CF%86.+%CE%91%CF%81%CF%87%CE%B9%CE%B5%CF%80%CE%B9%CF%83%CE%BA%CE%BF%CF%80%CE%BF%CF%85+%CE%9C%CE%B1%CE%BA%CE%B1%CF%81%CE%AF%CE%BF%CF%85+%CE%93'+51,+Nicosia+1070,+Cyprus&output=embed"
+              src="https://www.google.com/maps?q=%CE%9B%CE%B5%CF%89%CF%86.+%CE%91%CF%81%CF%87%CE%B9%CE%B5%CF%80%CE%B9%CF%83%CE%BA%CE%BF%CF%80%CE%BF%CF%85+%CE%9C%CE%B1%CE%BA%CE%B1%CF%81%CE%AF%CE%BF%CE%B9+%CE%93'+51,+Nicosia+1070,+Cyprus&output=embed"
               width="100%"
               height="100%"
               style={{
