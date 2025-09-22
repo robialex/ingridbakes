@@ -71,7 +71,6 @@ function useFadeInOnScroll(
     const el = ref.current;
     if (!el) return;
 
-    // Set initial state
     const translateClass =
       direction === "left"
         ? "translate-x-8"
@@ -86,13 +85,11 @@ function useFadeInOnScroll(
       "duration-700"
     );
 
-    // Helper to check if element is in viewport
     const isInView = () => {
       const rect = el.getBoundingClientRect();
       return rect.top < window.innerHeight - 80;
     };
 
-    // Fade-in logic
     const fadeIn = () => {
       if (isInView()) {
         el.classList.add("opacity-100");
@@ -101,10 +98,8 @@ function useFadeInOnScroll(
       }
     };
 
-    // Run fadeIn after delay, both on mount and on scroll
     const onScroll = () => setTimeout(fadeIn, delay);
 
-    // Check immediately on mount
     onScroll();
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -200,14 +195,12 @@ function LuxuryBakeryButton({
 function Navbar() {
   const [open, setOpen] = useState(false);
 
-  // Add/remove blur class on <body> when menu opens/closes
   useEffect(() => {
     if (open) {
       document.body.classList.add("menu-blur");
     } else {
       document.body.classList.remove("menu-blur");
     }
-    // Cleanup on unmount
     return () => {
       document.body.classList.remove("menu-blur");
     };
@@ -343,16 +336,68 @@ function Navbar() {
   );
 }
 
-// ====== Hero Section ======
-// Parallax effect removed for static background (fixes unwanted motion and build issues)
+// ====== Hero Section with Section-Specific, Always-Visible Background Shapes ======
+function HeroBackgroundShapes() {
+  return (
+    <div className="absolute inset-0 pointer-events-none select-none z-0">
+      {/* Navy/blue gradient base */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#102233] via-[#1B2940] to-[#2d3a57]" />
+      {/* Gold swirl shape (top left, responsive) */}
+      <svg
+        className="absolute left-[-8vw] top-[8vh] w-[40vw] h-[40vw] min-w-[120px] min-h-[120px] max-w-[320px] max-h-[320px] opacity-25"
+        viewBox="0 0 400 400"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M50,350 Q200,50 350,350"
+          stroke="#D4AF37"
+          strokeWidth="18"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+      {/* Artistic dots and sparkles (bottom right, responsive) */}
+      <svg
+        className="absolute right-[6vw] bottom-[8vh] w-[18vw] h-[18vw] min-w-[70px] min-h-[70px] max-w-[180px] max-h-[180px] opacity-15"
+        viewBox="0 0 200 200"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="100" cy="100" r="80" stroke="#e6c76e" strokeWidth="6" strokeDasharray="8 12" />
+        <circle cx="100" cy="100" r="30" fill="#D4AF37" fillOpacity="0.08" />
+      </svg>
+      {/* Subtle gold wave (center bottom, responsive) */}
+      <svg
+        className="absolute left-1/2 bottom-[4vh] -translate-x-1/2 w-[80vw] h-[10vw] min-w-[180px] min-h-[24px] max-w-[700px] max-h-[80px] opacity-10"
+        viewBox="0 0 800 100"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M0,80 Q200,20 400,80 T800,80"
+          stroke="#D4AF37"
+          strokeWidth="12"
+          fill="none"
+        />
+      </svg>
+    </div>
+  );
+}
+
 function Hero() {
   const ref = useFadeInOnScroll(0);
 
   return (
-    <section className="relative h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Static background image */}
+    <section className="relative h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
+      {/* Section-specific, always-visible background shapes */}
+      <HeroBackgroundShapes />
+      {/* Background image (no fog overlays) */}
       <div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-10"
         style={{ transform: "scale(1.04)" }}
       >
         <Image
@@ -363,48 +408,21 @@ function Hero() {
           className="object-cover object-right sm:object-center"
           sizes="100vw"
         />
-        {/* Decorative gold pattern overlay */}
-        <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
-        {/* Subtle gradient overlay for luxury */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#fff8e1]/80 via-transparent to-[#D4AF37]/10 pointer-events-none" />
+        {/* Gold pattern overlay for texture */}
+        <div className="absolute inset-0 bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
       </div>
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/20 pointer-events-none" />
-      {/* Decorative gold swirl */}
-      <svg
-        className="absolute right-4 bottom-4 w-20 sm:w-32 h-20 sm:h-32 opacity-10 pointer-events-none"
-        viewBox="0 0 100 100"
-        fill="none"
-      >
-        <path
-          d="M20 80 Q50 20 80 80"
-          stroke="#D4AF37"
-          strokeWidth="3"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r="8"
-          fill="#D4AF37"
-          fillOpacity="0.08"
-        />
-      </svg>
       {/* Content */}
       <div
         ref={ref}
         className="relative z-20 px-4 sm:px-6 text-center max-w-3xl flex flex-col items-center"
       >
-        {/* Creamy rectangle with gold border */}
         <div
-          className="bg-[#fff8e1]/80 rounded-xl px-4 sm:px-8 py-8 sm:py-10 shadow-2xl border-2 border-[#D4AF37] relative backdrop-blur-0 animate-fade-in-up"
+          className="bg-[#fff8e1]/90 rounded-xl px-4 sm:px-8 py-8 sm:py-10 shadow-2xl border-2 border-[#D4AF37] relative animate-fade-in-up"
           style={{
             boxShadow:
               "0 8px 32px 0 rgba(212,175,55,0.10), 0 2px 8px 0 rgba(0,0,0,0.10)",
           }}
         >
-          {/* Decorative gold shine top left */}
           <span className="absolute top-0 left-0 w-12 h-2 bg-gradient-to-r from-[#D4AF37]/60 to-transparent rounded-t-xl" />
           <h1 className="font-serif text-2xl sm:text-4xl md:text-6xl font-bold text-[#1B3A57] drop-shadow-[0_10px_25px_rgba(212,175,55,0.25)] mb-4 leading-tight animate-fade-in-up">
             Ingrid Bakes
@@ -415,7 +433,6 @@ function Hero() {
           >
             Luxurious cakes &amp; pastries, crafted with Mediterranean soul. Cozy interiors, golden moments.
           </p>
-          {/* Buttons stack vertically on mobile, inline on desktop */}
           <div
             className="flex flex-col gap-2 sm:flex-row sm:gap-4 justify-center w-full animate-fade-in-up"
             style={{ animationDelay: "0.3s" }}
@@ -458,9 +475,7 @@ function QuickIntro() {
       ref={ref}
       className="py-4 sm:py-10 md:py-16 bg-gradient-to-br from-[#fff8e1] via-[#f7f5f2] to-[#fff8e1] relative overflow-hidden"
     >
-      {/* Decorative gradient/pattern overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light" />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#fff8e1]/60 via-transparent to-[#D4AF37]/10" />
+      <div className="absolute inset-0 bg-[url('/imgs/gold-pattern.png')] bg-repeat opacity-10 mix-blend-soft-light pointer-events-none" />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <h2 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold text-[#1B3A57] mb-2 drop-shadow-[0_2px_8px_rgba(212,175,55,0.15)] animate-fade-in">
           Authentic &amp; Artisanal
@@ -907,8 +922,7 @@ function Footer() {
 // ====== Main Home Page ======
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#fff8e1] text-[#1B3A57] font-sans overflow-x-hidden">
-      {/* === GLOBAL STYLES (not nested) === */}
+    <div className="relative flex flex-col min-h-screen font-sans overflow-x-hidden">
       <style jsx global>{`
         /* Menu blur effect for mobile menu */
         body.menu-blur #__next > div:not(nav):not([id="mobile-menu"]),
