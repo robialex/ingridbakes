@@ -32,23 +32,3 @@ function CTASection() {
 }
 
 export default CTASection;
-
-// Simple placeholder GallerySection as a named export
-export function GallerySection() {
-  return (
-    <section className="py-12 bg-[#fff8e1] text-center">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#1B3A57]">
-        Our Gallery
-      </h2>
-      <p className="text-[#1B3A57]/80 max-w-xl mx-auto mb-8">
-        Beautiful creations from Ingrid Bakery.
-      </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 px-4 sm:px-6">
-        <div className="bg-[#f7e7b2] h-40 rounded-lg" />
-        <div className="bg-[#f7e7b2] h-40 rounded-lg" />
-        <div className="bg-[#f7e7b2] h-40 rounded-lg" />
-        <div className="bg-[#f7e7b2] h-40 rounded-lg" />
-      </div>
-    </section>
-  );
-}
